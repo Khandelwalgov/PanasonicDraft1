@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
 import replicate
+from replicate.client import Client
 import tempfile
 from dotenv import load_dotenv
 
@@ -21,6 +22,7 @@ LLM_MODEL = "mistralai/mistral-7b-instruct-v0.1"
 
 @app.route("/upload", methods=["POST"])
 def upload():
+
     if 'audio' not in request.files:
         return jsonify({"error": "No audio file found"}), 400
 
@@ -30,9 +32,11 @@ def upload():
 
     try:
         print("[BACKEND] Starting transcription using Replicate...")
+        replicate_client = Client(api_token=os.getenv("REPLICATE_API_TOKEN"))
+
         # Whisper transcription on Replicate
         with open(filepath, "rb") as f:
-            output = replicate.run(
+            output = replicate_client.run(
                 WHISPER_MODEL,
                 input={"audio": f, "language": "hi"}
             )
@@ -41,7 +45,7 @@ def upload():
 
         print("[BACKEND] Starting translation using Replicate...")
         # NLLB Translation
-        translation_output = replicate.run(
+        translation_output = replicate_client.run(
             NLLB_MODEL,
             input={"text": hindi_text, "src_lang": "hin_Deva", "tgt_lang": "eng_Latn"}
         )
@@ -98,7 +102,7 @@ def upload():
         ### Response:
         """
 
-        review_response = replicate.run(
+        review_response = replicate_client.run(
             LLM_MODEL,
             input={"prompt": prompt, "temperature": 0.7, "max_new_tokens": 1024}
         )
