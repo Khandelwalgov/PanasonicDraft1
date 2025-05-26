@@ -1,0 +1,10 @@
+venv
+# General
+__pycache__/
+*.pyc
+.env
+.env.local
+
+# React
+node_modules/
+build/
