@@ -24,10 +24,10 @@ export default function App() {
       formData.append("audio", blob, "recording.wav");
 
       try {
-        const res = await fetch("http://localhost:5000/upload", {
-          method: "POST",
-          body: formData,
-        });
+        const res = await fetch("https://fispitchaidraft1.onrender.com", {
+  method: "POST",
+  body: formData,
+});
 
         const data = await res.json();
         setHindiTranscript(data.hindi_transcript || "[No Hindi transcript returned]");
