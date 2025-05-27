@@ -10,7 +10,7 @@ UPLOAD_DIR = "recordings"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 # Your Colab/ngrok URL
-COLAB_URL = "https://0dcd-35-227-92-7.ngrok-free.app/process"
+COLAB_URL = "https://ae3e-35-230-59-62.ngrok-free.app/process"
 
 @app.route("/upload", methods=["POST"])
 def upload():
@@ -25,7 +25,7 @@ def upload():
         print("[RENDER] Forwarding audio to Colab backend...")
         with open(filepath, 'rb') as f:
             files = {'audio': f}
-            response = requests.post(COLAB_URL, files=files,timeout=40 )
+            response = requests.post(COLAB_URL, files=files,timeout=400 )
 
         if response.status_code != 200:
             return jsonify({"error": "Colab backend failed", "details": response.text}), 500
