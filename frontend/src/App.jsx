@@ -24,7 +24,7 @@ export default function App() {
       formData.append("audio", blob, "recording.wav");
 
       try {
-        const res = await fetch("https://fispitchaidraft1.onrender.com", {
+        const res = await fetch("https://fispitchaidraft1.onrender.com/upload", {
   method: "POST",
   body: formData,
 });
