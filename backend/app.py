@@ -10,7 +10,7 @@ UPLOAD_DIR = "recordings"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 # Your Colab/ngrok URL
-COLAB_URL = "https://a7a7-35-227-92-7.ngrok-free.app/"
+COLAB_URL = "https://a7a7-35-227-92-7.ngrok-free.app/process"
 
 @app.route("/upload", methods=["POST"])
 def upload():
