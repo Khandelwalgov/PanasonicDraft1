@@ -25,7 +25,7 @@ def upload():
         print("[RENDER] Forwarding audio to Colab backend...")
         with open(filepath, 'rb') as f:
             files = {'audio': f}
-            response = requests.post(COLAB_URL + "upload", files=files)
+            response = requests.post(COLAB_URL, files=files)
 
         if response.status_code != 200:
             return jsonify({"error": "Colab backend failed", "details": response.text}), 500
