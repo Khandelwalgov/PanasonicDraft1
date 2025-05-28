@@ -54,63 +54,58 @@ from flask_cors import CORS
 import os
 import requests
 import traceback
-import logging
 
 app = Flask(__name__)
 CORS(app)
 
-# Setup logging
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
-
 UPLOAD_DIR = "recordings"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-# Change this to your ngrok or Colab public URL
-COLAB_BASE_URL = "http://3d91-34-23-222-137.ngrok-free.app"
+COLAB_BASE_URL = "https://fbad-34-23-222-137.ngrok-free.app"
 
 @app.route("/upload", methods=["POST"])
 def upload():
     if 'audio' not in request.files:
-        logging.error("No audio file in request")
+        print("No audio file in request")
         return jsonify({"error": "No audio file found"}), 400
 
     audio_file = request.files['audio']
     filepath = os.path.join(UPLOAD_DIR, "recording.wav")
     audio_file.save(filepath)
-    logging.info(f"Audio file saved at {filepath}")
+    print(f"Audio file saved at {filepath}")
 
     try:
-        # Step 1: Transcription
         with open(filepath, 'rb') as f:
             files = {'audio': f}
-            logging.info("Sending file to /transcribe")
+            print("Sending file to /transcribe")
             resp_trans = requests.post(f"{COLAB_BASE_URL}/transcribe", files=files, timeout=1200)
-        
-        logging.debug(f"Transcription response code: {resp_trans.status_code}, body: {resp_trans.text}")
+
+        print("Transcription response code:", resp_trans.status_code)
+        print("Transcription response body:", resp_trans.text)
         if resp_trans.status_code != 200:
             return jsonify({"error": "Transcription failed", "details": resp_trans.text}), 500
         hindi_data = resp_trans.json()
 
-        # Step 2: Translation
-        logging.info("Sending Hindi transcript to /translate")
+        print("Sending Hindi transcript to /translate")
         resp_transl = requests.post(
             f"{COLAB_BASE_URL}/translate",
             json={"hindi_text": hindi_data["hindi_transcript"]},
             timeout=1200
         )
-        logging.debug(f"Translation response code: {resp_transl.status_code}, body: {resp_transl.text}")
+        print("Translation response code:", resp_transl.status_code)
+        print("Translation response body:", resp_transl.text)
         if resp_transl.status_code != 200:
             return jsonify({"error": "Translation failed", "details": resp_transl.text}), 500
         english_data = resp_transl.json()
 
-        # Step 3: Evaluation
-        logging.info("Sending English translation to /evaluate")
+        print("Sending English translation to /evaluate")
         resp_eval = requests.post(
             f"{COLAB_BASE_URL}/evaluate",
             json={"english_text": english_data["english_translation"]},
             timeout=1200
         )
-        logging.debug(f"Evaluation response code: {resp_eval.status_code}, body: {resp_eval.text}")
+        print("Evaluation response code:", resp_eval.status_code)
+        print("Evaluation response body:", resp_eval.text)
         if resp_eval.status_code != 200:
             return jsonify({"error": "Evaluation failed", "details": resp_eval.text}), 500
         eval_data = resp_eval.json()
@@ -122,15 +117,17 @@ def upload():
         })
 
     except Exception as e:
-        logging.error("Exception occurred", exc_info=True)
+        print("Exception occurred:", e)
+        traceback.print_exc()
         return jsonify({"error": "Exception occurred", "details": str(e)}), 500
 
     finally:
         if os.path.exists(filepath):
             os.remove(filepath)
-            logging.info(f"Deleted temp file: {filepath}")
+            print(f"Deleted temp file: {filepath}")
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
-    logging.info(f"Starting server on port {port}")
-    app.run(host="0.0.0.0", port=port)
+    print(f"Starting server on port {port}")
+    app.run(host="0.0.0.0", port=port, debug=True)
+
