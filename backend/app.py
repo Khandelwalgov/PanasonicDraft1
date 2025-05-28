@@ -61,7 +61,7 @@ CORS(app)
 UPLOAD_DIR = "recordings"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-COLAB_BASE_URL = "https://95d4-35-230-59-62.ngrok-free.app"
+COLAB_BASE_URL = "https://3d91-34-23-222-137.ngrok-free.app/"
 
 @app.route("/upload", methods=["POST"])
 def upload():
